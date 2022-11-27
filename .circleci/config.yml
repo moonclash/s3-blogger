@@ -1,0 +1,41 @@
+version: 2.1
+
+orbs: 
+  node: circleci/node@5.0.2
+
+executors:
+  common:
+    docker:
+      - image: cimg/node:16.15.0
+      - image: amazon/aws-cli
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    working_directory: ~/project
+
+jobs:
+  build-assets:
+    executor: common
+    steps:
+      - checkout
+      - node/install:
+          install-yarn: true
+          node-version: "16.3"
+
+      - run:
+          name: "Intall AWS CLI"
+          command: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install
+
+      - run:
+          name: "build dist files"
+          command: yarn && yarn build
+
+      - run:
+          name: "Upload content"
+          command: aws s3 sync ./dist s3://$S3_BUCKET/ --delete
+    
+
+workflows:
+  upload-content-to-bucket:
+    jobs:
+      - build-assets

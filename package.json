@@ -1,0 +1,20 @@
+{
+    "name": "s3-site-bootstrap",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "transpile:sass": "node-sass ./src/styles/main.scss dist/styles/main.css --output-style compressed",
+      "transpile:js": "babel src/scripts --out-dir dist/scripts",
+      "build": "yarn transpile:sass && yarn transpile:js"
+    },
+    "devDependencies": {
+      "node-sass": "7.0.1",
+      "@babel/cli": "^7.0.0",
+      "@babel/core": "^7.0.0",
+      "@babel/preset-env": "^7.6.11"
+    },
+    "author": "",
+    "license": "ISC"
+  }
+  
