@@ -29,6 +29,10 @@ jobs:
       - run:
           name: "build dist files"
           command: yarn && yarn build
+      
+      - run:
+          name: "convert markdown to html"
+          command: yarn convert:md
 
       - run:
           name: "Upload content"
