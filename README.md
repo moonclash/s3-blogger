@@ -1,13 +1,21 @@
-# s3-site-bootstraper
-A template repository with a complete setup for building static s3 websites
+# s3-blogger
+A template repository with a complete setup for hosting a static blog on Amazon S3
 
 ## Introduction
 
 Amazon's S3 (Simple Storage Service) is AWS's basic storage service, where users can store any objects in "buckets". However, S3 has a cool functionality that can convert a bucket into a static website.
 
-This template is useful for developers that want to spin up a quick static website for documentation purposes, personal websites, blogs, galleries, or anything that doesn't need a backend server.
+This template can be used by anyone that wants a simple blog and an even simpler writing experience. All you gotta do is go to the `/src/posts` directory, create a folder, create an `index.md` file inside and let your creative juices flow!
+
+I've chosen to go with Markdown as the format for writing as it's widely known and extremely simple to learn and use.
+
+There's some basic styling to make the blog posts look nice, like so:
+
+<img width="822" alt="Screenshot 2022-11-28 at 16 44 35" src="https://user-images.githubusercontent.com/12881226/204320443-05c66ddf-1170-4964-bcb8-1127a1ed2464.png">
+
 
 The project includes a SASS and JavaScript transpilation, which will transform your sassy and es6 code into vanilla code and most importantly it includes a CircleCI setup, which will automatically transpile all of your code and upload it to your S3 bucket whenever you merge changes in your repository's `main` branch.
+
 
 
 ## Requirements
@@ -39,9 +47,32 @@ In CircleCI's project page set your environment variables from AWS:
 
 `$S3_BUCKET`
 
-Once those variables are set, all you need to worry about is writing your SASS, JS and HTML and merging to your main branch. The pipeline will take care of transpiling and uploading your production code to your S3 Bucket.
+Once you have these in place, all you need to do is write your blog posts and pusht to `main` - the pipeline will take care of converting your markdown into html and will build a simple routing table at the index.html file.
 
-### Useful links:
+### Useful links and answers:
+
+Amazon S3 bucket policy to allow your static website to be accessed by the public:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::Bucket-Name/*"
+            ]
+        }
+    ]
+}
+```
+
+[The s3-bootsrapper template this is based on](https://github.com/moonclash/s3-site-bootstraper)
 
 [Hosting a static site on a S3 bucket](https://docs.aws.amazon.com/AmazonS3/latest/userguide/HostingWebsiteOnS3Setup.html)
 
