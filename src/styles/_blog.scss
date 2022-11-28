@@ -17,6 +17,9 @@ html, body.blog-post {
 body.blog-post {
     background: $bg-color;
     color: $text-color;
+    max-width: 750px;
+    margin: 0 auto;
+    
     pre {
         padding: 10px;   
     }
