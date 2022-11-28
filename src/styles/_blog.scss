@@ -19,7 +19,7 @@ body.blog-post {
     color: $text-color;
     max-width: 750px;
     margin: 0 auto;
-    
+
     pre {
         padding: 10px;   
     }
@@ -35,7 +35,7 @@ body.blog-post {
         margin: 0 auto;
     }
     
-    h1, h2, h3, p, ul, li {
+    h1, h2, h3, p, ul, li, a {
         font-family: $main-text-font;
     }
     
@@ -45,9 +45,17 @@ body.blog-post {
         font-size: 2rem;
     }
     
-    p {
+    p, a {
         font-size: $text-font-size;
         line-height: 1.5;
+    }
+
+    a {
+        color: $code-text-color;
+        &:last-child {
+            display: inline-block;
+            margin-bottom: 20px;
+        }
     }
     
     ul {
