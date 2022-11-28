@@ -32,7 +32,7 @@ jobs:
       
       - run:
           name: "convert markdown to html"
-          command: yarn buildArticles
+          command: yarn convert:md
 
       - run:
           name: "Upload content"
