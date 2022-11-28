@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../styles/main.css"><link>
+    <title>Blog title</title>
+</head>
+<body class="blog-post">
+    <hr />
+<p>title: 5 - Web sessions explained
+date: "2020-12-25T22:12:03.284Z"</p>
+<h2 id="descriptioncrackingacoldseshwiththebois">description: "Cracking a cold sesh with the bois"</h2>
+<p>Hola Hola, it's your boi coming at you with another knowledge bomb. I was inspired to write about web sessions after shopping for christmas presents on this web site and the terrible user experience it had. Basically I spent a solid 2 hours browsing products on the site, page by page, trying to find the perfect gifts, adding them to my cart one by one. When I was ready to check out, the site asked me to log in or register, and after registering, to my unpleasant surprise I found out that my cart was completely empty. It was really annoying, and the first thought in my head was: "Have these guys ever heard about sessions?". I have some theory about sessions, and then we'll get our hands dirty and implement a very simple example in Flask.</p>
+<h3 id="sowhataresessionsexactly">So what are sessions exactly?</h3>
+<p>To start off with some context to make things easier to understand, let's imagine, that we have a site, and we need to store data about the user between loading different pages. By default, HTTP is <strong>stateless</strong>, meaning that it does not preserve any data between different pages. Right. So we need to figure out a way to be able to pass that data.</p>
+<p>We could store it in a database, but if we store all of the users' data in a database, it will get bloated and slow very quick, as the data we need let's say when a user is signing up, we might not need permamently.</p>
+<p>Ok then, let's store it in local storage you say? Cool, but then you give too much control to the client, the user might clean their local storage, or have JavaScript disabled, not to mention that you might be storing sensititive data on a potentially publically accessible device.</p>
+<p>Maybe URL params? This will be annoying to implement and write extra logic and make our requests more complicated to read. Also the URL bar will look like you've gone back to the early 2000s.</p>
+<p>Enter web sessions on the back end.</p>
+<p>We store that data on server side and we give the session an ID, which we can tie to the user. There we go, that's how sessions work in a nutshell. You won't be having to ever implement sessions functionality from scratch, as most web frameworks have them right off the bat. Sessions are simple to use and are basically a key / value storage, which you can easily read and write to.</p>
+<p>Let's open and IDE and write a simple session example, using Python and Flask.</p>
+<h3 id="sessionimplementationinpythonflask">Session implementation in Python + Flask</h3>
+<p>All of this code is available on my <a href="https://github.com/moonclash/blog-code-examples/tree/master/sessions-blog-post">GitHub</a>.</p>
+<p>I have a basic Docker + docker-compose set up that creates a python image, installs Flask and Flask-Session and spins up a container:</p>
+<p><strong>Dockerfile</strong></p>
+<pre><code class="Dockerfile language-Dockerfile">FROM python:latest
+
+WORKDIR /session-app
+
+COPY . .
+
+RUN pip3 install -r requirements.txt
+</code></pre>
+<p><strong>docker-compose</strong></p>
+<pre><code class="yaml language-yaml">version: '3'
+
+services:
+
+  session-tut:
+    container_name: session_boi
+
+    build: 
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      - .:/session-app
+
+    ports:
+      - '8000:8000'
+
+    command: python3 src/main.py
+</code></pre>
+<p>All of our code is going to live inside one file, as we don't need much for this tutorial:</p>
+<p><strong>main.py</strong></p>
+<pre><code class="python language-python">from flask import Flask, session, jsonify
+from flask_socketio import SocketIO
+
+app = Flask(__name__)
+app.secret_key = '1234xadas'
+socketio = SocketIO(app)
+</code></pre>
+<p>Here we import Flask, session and jsonify so we can return json responses, we instantiate a Flask object to be our app and we give it a super secret key. We'll use <code>SocketIO</code> to run our little app, and we instantiate that with the app isntance.</p>
+<p>So far so good, let's write our first route and interact with the session straight away:</p>
+<pre><code class="python language-python">@app.route('/')
+def index():
+  session['start'] = True
+  return 'hello'
+</code></pre>
+<p>Add this code to the end of the file and let's run the app via <code>docker-compose up</code></p>
+<pre><code class="python language-python">if __name__ == '__main__':
+  socketio.run(app, host='0.0.0.0', port=8000, debug=True)
+</code></pre>
+<p><code>docker-compose up</code></p>
+<p>If we go to our localhost pon port 8000, we'll see a tiny little hello greeting us from the browser.</p>
+<p><code>session['start'] = True</code></p>
+<p>This line of code literally stores the value <code>True</code> to the key <code>start</code> of the session. And since this is a simple key/value storage, we cann view all the keys and values easily. To make things more DRY, I wrote a little helper method that uses dictionary comprehension to construct an object from the items of the session like so:</p>
+<pre><code class="python language-python">def comp_helper(_dict):
+  return {k : v for (k, v) in _dict.items()}
+</code></pre>
+<p>Ok, let's write another route:</p>
+<pre><code class="python language-python">@app.route('/cherries')
+def cherries():
+  session['fruit'] = 'cherries'
+  return jsonify({'response': 'cherries', 'session': comp_helper(session)})
+</code></pre>
+<p>Here, we simply assing the <code>fruit</code> key to point to "cherries".</p>
+<p>We'll return a simple JSON response, where we can see how the session currently looks like, and if we got to <code>/cherries</code> on our localhost, to no surprise we see:</p>
+<pre><code class="json language-json">{
+  "response": "cherries",
+  "session": {
+    "fruit": "cherries",
+    "start": true
+    }  
+}
+</code></pre>
+<p>Remember, this is mutable data type, so we can overwrite anything in the session, whenever we please. </p>
+<p>Let's see that in action with another view:</p>
+<pre><code class="python language-python">@app.route('/blueberries')
+def blueberries():
+  session['fruit'] = 'blueberries'
+  return jsonify({'response': 'blueberries', 'session': comp_helper(session)})
+</code></pre>
+<p>On our <code>/blueberries</code> route, we overwrite <code>fruit</code> to be <code>blueberries</code>, and the response can confirm that:</p>
+<pre><code class="json language-json">{
+  "response": "blueberries",
+    "session": {
+      "fruit": "blueberries",
+      "start": true
+    }
+}
+</code></pre>
+<p>Amazing right? </p>
+<p>What if we want to delete the session? Don't worry. It's easier than pie. Actually I don't know why this is even a saying, making a pie is harder than most things. It should be something like "It's easier than drinking water"</p>
+<pre><code class="python language-python">@app.route('/destroy-session')
+def destroy_session():
+  session.clear()
+  return jsonify({'response': 'session destroyed', 'session': comp_helper(session)})
+</code></pre>
+<p>And when we go to <code>/destroy-session</code>, we see that our tactical nuke has been successful:</p>
+<pre><code class="json language-json">{
+  "response": "session destroyed",
+  "session": {}
+}
+</code></pre>
+<p>So easy!</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>Web sessions are a simple, but very powerful tool that can help you provide a better experience for your users, and you should be taking advantage of them as much as you can. Obviously don't use them as a full blown DB, but you get my point.</p>
+<p>Until next time</p>
+    <a href="/">back to home</a>
+</body>
+</html>

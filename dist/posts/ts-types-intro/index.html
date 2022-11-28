@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../styles/main.css"><link>
+    <title>Blog title</title>
+</head>
+<body class="blog-post">
+    <hr />
+<p>title: 9 - Your gentle introduction to types in TypeScript
+date: "2021-06-19T22:12:03.284Z"</p>
+<h2 id="description">description: ""</h2>
+<p>How do you do, my loyal fanbase of 3 people? I am a little bit ashamed that I have neglected my little blog for such a long time.The last time I wrote a post was in April! And there I was hoping I'd be shipping out a post a week. But I do have a good excuse, which could serve as the premise for this post. I have been very busy over the last few months - planning and executing the steps that I needed to move back to my glorious home country - Bulgaria. </p>
+<p>So life has been a bit busy with me travelling back and forth to look for places to live, open bank accounts, get a bulgarian phone number, send my valuables from the UK to Bulgaria, etc etc. </p>
+<p>One of these steps naturally was finding a new job. I did not want to go back to working in an office, so I looked for fully remote companies. I won't go too much into the details of how interviewing remotely went in this blog post, because I do plan to write a separate piece about that, but long story short -  I found a company, which I really, really liked and I was lucky to get to talk to them and eventually receive an offer.</p>
+<p>So what does all of this have to do with types in TypeScript? Well, in the spirit of big changes, I decided that I want to switch to writing JavaScript professionally. Nothing personal, Python, but JS was the language I started programming with and while building up my career, I always felt this <code>void</code> in me, caused by the fact I never managed to write JS as my main language for a job. </p>
+<p>As you can imagine, most places with a big JS codebase use TypeScript. And if you like me wondered "Why?", I hope this gentle intro to TypeScript and its types can give you a better understanding. Now let's go!</p>
+<h3 id="oksowhatexactlyistypescript">Ok, so what exactly is TypeScript?</h3>
+<p>TypeScript is actually a programming language. Yep, back in the day I kinda thought it's something like a pre-processor, but nope - TypeScript is an actual language, developed by Microsoft. TypeScript is built on top of JavaScript and it adds static type definitions to JavaScript. Now, here normally I would tell you what the benefits of TypeScript are, and why and when it should be used, but when I started diving into it (not too long ago), I didn't know that. And I can list a whole bunch of perks here, but let's take a different approach. I'm gonna show you the language's features, what they do and then as always in our little summary in the end we'll evaluate how useful they are.</p>
+<p>So as you know JavaScript is a weird boi. It's dynamically typed language (just like Python), which pretty much means that you don't have to define the types for your variables, they don't get compiled, and they get defined during runtime. </p>
+<p>So in JS you can totally do something like this:</p>
+<pre><code class="javascript language-javascript">let someCoolVariable;
+someCoolVariable = 'hey I am a string';
+someCoolVariable = false;
+someCoolVariable = 5;
+someCoolVariable = null;
+
+// uncle JS is cool with everything 
+</code></pre>
+<p>I don't need to define the type of this variable when I declare it, and I can change it's value and it's type to whatever I want at any point (unless I used <code>const</code>, but that's a different topic). </p>
+<p>Alright, so we get what dynamic typing is, but what about static typing?</p>
+<p>Static typing means that we are enforced to declare the type of our variables, and those types will be verified during <em>compile</em> time, or during runtime too, then it's called <em>dynamic checking</em>.</p>
+<p>Let's look at static type language like Java:</p>
+<pre><code class="java language-java">class Main {  
+  public static void main(String args[]) {
+    String myCoolVariable; // we define the type of the variable along with the variable itself - a string in this case
+    myCoolVariable = "I am super cool"; // we give it a value 
+    myCoolVariable = 10; // boom - our code won't even compile at this point
+    System.out.println(myCoolVariable); 
+  } 
+}
+</code></pre>
+<p>Alright, so clearly there is a difference here. And you might think, well hol' up. I like the JS way - it's less code and I can do whatever I want with my varibales. </p>
+<p>Ok, I hear you, but imagine you have the following scenario.</p>
+<p>You have to write a function that let's say registers a user ID based on an input element from a form:</p>
+<pre><code class="javascript language-javascript">function registerUserID(id) {
+  // do some logic here
+}
+</code></pre>
+<p>Less code, no need to worry about types. But what if your user isn't a little angel like you naively thought and enters a string of non-numeric characters? Also you surely are aware, that every input field will always give you a string? You'd have to make your code safer right?</p>
+<pre><code class="javascript language-javascript">function registerUserID(id) {
+  if (typeof(id) !== 'number') {
+    throw new Error('please provide a number')
+  }
+  // do some logic here
+}
+</code></pre>
+<p>And you'd kinda want to document that function right?</p>
+<pre><code class="javascript language-javascript">function registerUserID(id) {
+  // @param id: number
+  if (typeof(id) !== 'number') {
+    // we need to be sure we only accept numbers as inputs
+    throw new Error('please provide a number')
+  }
+  // do some logic here
+}
+</code></pre>
+<p>What if your function had multiple inputs, would you go crazy and do something like:</p>
+<pre><code class="javascript language-javascript">function addNumbers(n1, n2, n3) {
+  // @param n1: number, n2: nunber, n3: number, n4: number
+  if (typeof(n1) !== 'number' || typeof(n2) !== 'number' || typeof(n3) !== 'number' ) {
+    // we need to be sure we only accept numbers as inputs
+    throw new Error('please provide a number')
+  }
+  // do some logic here
+}
+</code></pre>
+<p>Yeah, yeah, I hear your counter-argument that you could do something like <code>[...arguments].every(n =&gt; typeof(n) === 'number')</code></p>
+<p>But do you see where the issue is? If we want our JS to do what we intend it to do, the dynamic types are now forcing us to write more code, to check the type of the variable before we do any operations with it, and to document our intentions so our colleagues can now how we intended the function to work.</p>
+<p>If we could declare the types of our variables, our compiler would shout at us if we gave the wrong type of data, and if someone else was reading our code, they would go "Oh okay, so this takes a number", without us having to explicitly comment that in our code.</p>
+<p>Enter TypeScript.</p>
+<p>Like I said before, TypeScript is built on top of JavaScript, so if you can read and write JS, you won't have too much trouble reding TypeScript. Also, all JS is valid TS, but not the other way around, and we will shortly understand why. </p>
+<p>Let's take our previous function and re-write it in TS:</p>
+<pre><code class="typescript language-typescript">function registerUserID(id: number) {
+  // do some logic here
+}
+</code></pre>
+<p>Doesn't look that different right? See, I told you it's not that different. The maint thing here we want to pay attention to is the <code>(id: number)</code> in our function. Since TS is a static type language, we can give our parameter a type. And the TS compiler will shout at us if we attempt to do something like:</p>
+<pre><code class="typescript language-typescript">registerUserID('andy');
+</code></pre>
+<p>But do you see how much code we are now saving just by declaring that one type? Do you see how more readable our function is?</p>
+<p>We know that it takes a number, and we don't have to write checks. TypeScript will do it for us during compile time!</p>
+<p>And this is the beauty of TypeScript - it makes our code so much more readable, safer and predictable!</p>
+<p>Let's learn about the core types in TS!</p>
+<h3 id="thecoretypes">The core types</h3>
+<p>TypeScript has all the types you're already familiar with from JavaScript and it also inroduces a few new ones that only exist in TS.</p>
+<p><strong>number, string and boolean</strong></p>
+<p>Nothing crazy here, you already know what these mean. Let's see how we can use them in a function:</p>
+<pre><code class="typescript language-typescript">function scientificCalculator(num1: number, num2: number) {
+  return num1 * num2;
+}
+
+function nameYeller(name: string) {
+  return `AAAAAAAH ${name}!`
+}
+
+function inverseBool(thing: boolean) {
+  return !boolean;
+}
+</code></pre>
+<p>As you can see, to define the type of the parameter, we simply say <code>param: type</code> and TS will know what type we want and will enforce validation. But wait! We've seen this done on function parameters only so far, how can we do it on a variable?</p>
+<p>Well I'm glad you asked, because I'm gonna tell you about</p>
+<p><strong>Type inference</strong></p>
+<p>Type inference is an amazing feature, that TypeScript implements, which allows TypeScript to <em>infere</em> the type of a variable. Let's see an example:</p>
+<pre><code class="typescript language-typescript">// let's declare a variable here 
+
+const myAwesomeVar = 'oh damn this is awesome';
+
+// we can also do
+
+const myOtherAwesomeVar: string = 'is this more awesome?';
+</code></pre>
+<p>So which option should we use? It's TYPEscript right, so we should be using the latter one? Won't TS complain?</p>
+<p>Nope!</p>
+<p>Type inference put simply means that TS will (very accurately) get the type of the variable from it's value.</p>
+<p>So when we said <code>const myAwesomeVar = 'oh damn this is awesome';</code>, then TS looks at the right side of our assignment and goes "Oh, so you put a string there, I am going to infere this variable to be of type <code>string</code>"</p>
+<p>So when we say</p>
+<pre><code class="typescript language-typescript">const foo = 1;
+</code></pre>
+<p>TS does</p>
+<pre><code class="typescript language-typescript">const foo: number: 1;
+</code></pre>
+<p>And we can use a <code>let</code> to prove that:</p>
+<pre><code class="typescript language-typescript">let foo = 1;
+foo = 'i am now a string'; // TS will explode on us here, because it infered foo as type number above
+</code></pre>
+<p>How awesome is that? And you thought we'd have to write more code. Bah!</p>
+<p><strong>Array and Object types</strong></p>
+<p>To declare an Array as a type on a variable in TS, we can say:</p>
+<pre><code class="typescript language-typescript">const myArray = [1, 2];
+</code></pre>
+<p>Ok, so we've defined a variable and we point it to an array, that contains 2 numbers. Now try and guess what will happen if we say <code>myArray.push('hello');</code>.</p>
+<p>If you thought "TypeScript will yell at us", then colour me impressed - you got type inference right off the bat!
+If you didn't, don't worry about it, I'll tell you why it will yell.</p>
+<p>When we say</p>
+<pre><code class="typescript language-typescript">const myArray = [1, 2];
+</code></pre>
+<p>TS will infere, that we are creating a variable <code>myArray</code> with the type <code>Array</code> that holds <code>number</code> types. So when we try to push a string to our array, type checking is enforced and the compiler yells at us. </p>
+<p>What happens under the hood with type inference is something like this</p>
+<pre><code class="typescript language-typescript">const myArray: number[] = [1, 2];
+</code></pre>
+<p>This little <code>number[]</code> syntax means "This is a type <code>Array</code> that will hold values of type <code>number</code>;</p>
+<p>Ok let's run another little test, suppose we have:</p>
+<pre><code class="typescript language-typescript">const anotherArray = ['hello'];
+</code></pre>
+<p>What do you think the little type syntax would look like here? That's right, it will look like this:</p>
+<pre><code class="typescript language-typescript">const anotherArray: string[] = ['hello'];
+</code></pre>
+<p>Alright, you say, but I thought JS was such a cool dude, because it lets us store anyhing inside an array.</p>
+<p>Don't worry, TS has you covered:</p>
+<pre><code class="typescript language-typescript">const mixedArray: any[] = ['hello', 420, '1', false, (a) =&gt; a * a];
+mixedArray.push({'hello': 'world'});
+</code></pre>
+<p>Welcome to TypeScript's <code>any</code> type!</p>
+<p><code>any</code> is a type that can be anything. AKA old school vanilla JS style typing - we can literally give it anything and it'll be cool with it.</p>
+<p>Now you won't probably have to store different types of values in an array in your day-to-day work, but if you do, that's how you do it.</p>
+<p>Let's see how objects work. We'll use my trusty dog Loki as our subject</p>
+<pre><code class="typescript language-typescript">const dog = {
+  name: 'Loki',
+  age: 1
+};
+</code></pre>
+<p>So how would type inference work here?</p>
+<p>Well pretty interesting actually, TS will not only infere that this variable is of the type <code>Object</code>, but also the types of the properties we give it.</p>
+<p>So if we attempt to do something like:</p>
+<p><code>dog.name = 5</code> or <code>dog.breed = 'whippet'</code>, the compiler will, you guessed it - shout at us again. </p>
+<p>This is how this gets infered under the hood:</p>
+<pre><code class="typescript language-typescript">const dog: {
+  name: string;
+  age: number;
+} = {
+  name: 'Loki',
+  age: 1
+}
+</code></pre>
+<p>And if we want to use it in a function:</p>
+<pre><code class="typescript language-typescript">function updateDog(dog: {name: string; age: number;}, name: string, age: number) {
+    dog.name = name;
+    dog.age = age;
+    return dog;
+  }
+</code></pre>
+<p><strong>Return types</strong></p>
+<p>Ok, so we've learned how to give types to parameters in our functions, but what about if we want to also tell what the return type of a function would be?</p>
+<p>Let's see how that works:</p>
+<pre><code class="typescript language-typescript">function square(num1: number): number {
+  return num1 * num1;
+}
+</code></pre>
+<p>Note that like variable type inference, you don't need to explicitly define your return type. TypeScript is smart enough to look at the return statement and infere the return type.</p>
+<p><strong>Union types</strong></p>
+<p>Union types allow us to combine a few different types into one.</p>
+<p>Let's look back at our user id function from before. As you know, an ID might be a number like <code>5231</code>, but it also can be <code>HQZ2015</code>. Let's modify our function's parameter type with a union:</p>
+<pre><code class="typescript language-typescript">function registerUserID(id: number | string) {
+  // do some logic here
+}
+</code></pre>
+<p><code>id: number | string</code> means that TypeScript will allow us to perform any operations we could perform on both of these types. Which means that we would be able to do something like:</p>
+<pre><code class="typescript language-typescript">function registerUserID(id: number | string) {
+  return 'The ID is: ' +  id;
+  // do some logic here
+}
+</code></pre>
+<p>But if we try to do:</p>
+<pre><code class="typescript language-typescript">function registerUserID(id: number | string) {
+  id.toUpperCase();
+  // do some logic here
+}
+</code></pre>
+<p>We will get an error, because the <code>number</code> type doesn't have a <code>toUpperCase</code> method. We can only use operations we can do on all the types.</p>
+<p>We can have as many types as we'd like in a union.</p>
+<pre><code class="typescript language-typescript">function itCanBeAnything(thing: number | string | boolean | Array) {
+
+}
+</code></pre>
+<p>But as you can already tell, the more types we add, the less the operations we can perform are.</p>
+<p><strong>Enums</strong></p>
+<p>Enums allow us to define a set of named constants. Think of it as a way to give a number to a label.</p>
+<p>We can define an enum like so:</p>
+<pre><code class="typescript language-typescript">enum Role {
+  Admin,
+  User,
+  SuperUser
+}
+</code></pre>
+<p>Our Admin value will start at 0, and each sequential value in the enum will get autouincremented by 1.</p>
+<p>and we can use them in a function like so:</p>
+<pre><code class="typescript language-typescript">function validateUser(user: string, role: Role) {
+
+}
+
+validateUser('emil', Role.Admin);
+</code></pre>
+<p><strong>Literal types</strong></p>
+<p>We can use literal types to refer to <em>specific</em> things. The easiest way to understand how literals work is to think about the good old <code>let</code> and <code>const</code> in vanilla JS.</p>
+<p>So if we have </p>
+<pre><code class="typescript language-typescript">let dog = 'Loki'; // this is infered as a string type
+dog = 'Lassie'; // because we have defined it with let, we can update its value
+
+const cat = 'Lady'; // because we are using const, this can't be changed, so it's infered as a literal
+</code></pre>
+<p>Of course, we can manually set a literal type like so:</p>
+<pre><code class="typescript language-typescript">let dog: 'loki' = 'loki';
+dog = 'lassie'; // this will throw, as we explicitly set a literal on the above line
+</code></pre>
+<p>Now, a literal on its own doesn't serve much value, but we can get creative by creating a union out of literal:</p>
+<pre><code class="typescript language-typescript">function feedLoki(food: 'kibbles' | 'wet-food' | 'cooked meat') {
+  // logic
+}
+feedLoki('kibbles');
+feedLoki('chocolate'); // this will throw (and won't kill my dog)
+</code></pre>
+<h3 id="conclusion">Conclusion</h3>
+<p>This is the first post of my TypeScript series, I will be writing about what I have learned as I go. My own conclusion is that I am really hyped about it and I think it can really make your code more readable and predictable, and after a few hours of learning and using types, my old stigma that including types in JS will just bloat the code and force us to write more is gone. It actually forces us to write cleaner, more predictable code and the most important part - more readable. I have been going crazy on code readbility recently and TypeScript provides that out of the box.</p>
+<p>Until next time.</p>
+    <a href="/">back to home</a>
+</body>
+</html>

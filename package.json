@@ -8,8 +8,7 @@
       "transpile:js": "babel src/scripts --out-dir dist/scripts",
       "build": "yarn transpile:sass && yarn transpile:js",
       "convert:md": "node postConverter.js",
-      "build:urls": "node urlBuilder.js",
-      "buildArticles": "yarn convert:md && yarn build:urls"
+      "build:urls": "node urlBuilder.js"
   },
   "devDependencies": {
       "@babel/cli": "^7.0.0",
