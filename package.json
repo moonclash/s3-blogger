@@ -7,7 +7,9 @@
       "transpile:sass": "node-sass ./src/styles/main.scss dist/styles/main.css --output-style compressed",
       "transpile:js": "babel src/scripts --out-dir dist/scripts",
       "build": "yarn transpile:sass && yarn transpile:js",
-      "convert:md": "node postConverter.js"
+      "convert:md": "node postConverter.js",
+      "build:urls": "node urlBuilder.js",
+      "buildArticles": "yarn convert:md && yarn build:urls"
   },
   "devDependencies": {
       "@babel/cli": "^7.0.0",
