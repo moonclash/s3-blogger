@@ -1,0 +1,27 @@
+h1 {
+    font-family: $headings-font;
+    text-align: center;
+}
+
+.articles-list {
+    display: flex;
+    flex-flow: column-reverse wrap;
+    max-width: 800px;
+    margin: 0 auto;
+    perspective: 1000px;
+
+    a {
+        font-family: $main-text-font;
+        font-size: 1.5rem;
+        padding: 10px;
+        color: $code-text-color;
+        text-decoration: none;
+        box-shadow: 0 0 2px 1px;
+        border-radius: 5px;
+        margin: 5px;
+        transition: 400ms all ease-in-out;
+        &:hover {
+            transform: translate3d(0, 0, 34px);
+        }
+    }
+}
